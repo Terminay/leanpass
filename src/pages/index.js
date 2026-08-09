@@ -58,7 +58,7 @@ export default function Home() {
                 <em>that</em> they flow, you need source code that fits in your head.
               </p>
               <p>
-                This is that library. ~500 lines of pure NumPy. Every
+                This is that library. ~730 lines of pure NumPy. Every
                 <code>backward()</code> call traces through the graph step by step.
                 No magic, no abstraction layers, just vector calculus you can read
                 line by line.

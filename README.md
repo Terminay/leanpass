@@ -7,7 +7,7 @@
 ![Tests](https://img.shields.io/github/actions/workflow/status/Terminay/LeanPass/summary.yml?label=tests)
 ![CodeQL](https://img.shields.io/github/actions/workflow/status/Terminay/LeanPass/codeql.yml?label=CodeQL)
 ![PyPI Publish](https://img.shields.io/github/actions/workflow/status/Terminay/LeanPass/publish-pypi.yml?label=PyPI%20publish)
-![Size](https://img.shields.io/badge/size-~118KB-lightgrey)
+![Size](https://img.shields.io/badge/size-~8.5KB-lightgrey)
 ![Real Downloads](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Terminay/LeanPass/main/badge.json)
 [![Stars](https://img.shields.io/github/stars/Terminay/LeanPass?style=social)](https://github.com/Terminay/LeanPass/stargazers)
 
@@ -155,13 +155,13 @@ LeanPass is designed to be minimal. Here is how it compares to other frameworks:
 
 | Library | Package Size | Lines of Code | Dependencies | Install Time |
 |---------|-------------|---------------|-------------|--------------|
-| **LeanPass** | **~118 KB** | **~730** | **1 (NumPy)** | **~2 seconds** |
+| **LeanPass** | **~8.5 KB** | **~730** | **1 (NumPy)** | **<1 second** |
 | Micrograd | ~15 KB | ~150 | 0 | ~1 second |
 | PyTorch | ~800+ MB | millions | many (CUDA, etc.) | ~minutes |
 | TensorFlow | ~1+ GB | millions | many (CUDA, etc.) | ~minutes |
 | JAX | ~200+ MB | millions | several | ~minutes |
 
-LeanPass is **~7000x smaller** than PyTorch and **~9000x smaller** than TensorFlow, while still providing the core autodiff, neural network layers, and optimizers needed for small-scale experiments and learning.
+LeanPass is **~14,000x smaller** than PyTorch and **~40,000x smaller** than TensorFlow, while still providing the core autodiff, neural network layers, and optimizers needed for small-scale experiments and learning.
 
 ## Examples
 
