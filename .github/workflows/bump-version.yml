@@ -1,0 +1,53 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "New version: no leading 'v'"
+        required: true
+        type: string
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version format
+        run: |
+          if ! [[ "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must be X.Y.Z (e.g. 0.1.6), got '${{ inputs.version }}'"
+            exit 1
+          fi
+
+      - name: Bump version across codebase
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+        run: |
+          if [ -f pyproject.toml ]; then
+            sed -i -E "s/^version = \"[0-9]+\.[0-9]+\.[0-9]+\"/version = \"${NEW_VERSION}\"/" pyproject.toml
+          fi
+
+          if [ -f setup.cfg ]; then
+            sed -i -E "s/^version = [0-9]+\.[0-9]+\.[0-9]+/version = ${NEW_VERSION}/" setup.cfg
+          fi
+
+          grep -rl "__version__" leanpass/ 2>/dev/null | xargs -r sed -i -E \
+            "s/__version__ = \"[0-9]+\.[0-9]+\.[0-9]+\"/__version__ = \"${NEW_VERSION}\"/"
+
+      - name: Commit and tag
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: bump version to v${NEW_VERSION}"
+          git tag "v${NEW_VERSION}"
+          git push origin HEAD
+          git push origin "v${NEW_VERSION}"
