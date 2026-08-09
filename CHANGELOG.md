@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [keep-a-changelog.org](https://keepachangelog.org/) and uses semantic versioning.
 
+## [0.1.6] - 2026-08-09
+
+### Added
+
+- new CI workflow for issues
+- GitHub Actions workflow to bump version
+
+### Fixed
+
+- Store `_prev` as a tuple in sum() and mean()
+- Bump the npm_and_yarn group across 1 directory with 4 updates
+
 ## [0.1.5] - 2026-07-30
 
 ### Added
