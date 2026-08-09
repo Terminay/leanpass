@@ -10,6 +10,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [keep-a-changelog.org](https://keepachangelog.org/) and uses semantic versioning.
 
+## [0.1.7] - 2026-08-09
+
+### Added
+
+- `optim.SGD` now supports momentum and L2 weight decay
+- `optim.Adam` now supports optional L2 weight decay
+- `nn.Dropout` layer for training-time regularization
+- `Tensor.clip(a_min, a_max)` / `Tensor.clamp(min, max)` value clamping
+- Basic indexing support via `Tensor[...]` with autodiff propagation
+
+### Changed
+
+- Updated documentation and README to reflect the new optimizer and tensor APIs
+
 ## [0.1.6] - 2026-08-09
 
 ### Added
