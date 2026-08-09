@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [keep-a-changelog.org](https://keepachangelog.org/) and uses semantic versioning.
 
+## [0.1.5] - 2026-07-30
+
+### Added
+
+- Cloudflare Workers configuration by @cloudflare-workers-and-pages[bot]
+
+### Fixed
+
+- Repaired `0.1.4` version on PyPI not having all files 
+
 ## [0.1.4] - 2026-07-28
 
 ### Added
