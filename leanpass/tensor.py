@@ -238,6 +238,31 @@ class Tensor:
         out._backward = _backward
         return out
 
+    def clip(self, a_min=None, a_max=None):
+        """Clamp tensor values to the interval [a_min, a_max].
+
+        Both bounds are optional. The backward pass only propagates gradient
+        for elements that were not clipped (standard straight-through behavior).
+        """
+        out_data = np.clip(self.data, a_min, a_max)
+        out = self._create_child(out_data, "clip", (self,), meta={"min": a_min, "max": a_max})
+
+        def _backward():
+            if self.requires_grad:
+                mask = np.ones_like(self.data, dtype=np.float64)
+                if a_min is not None:
+                    mask = mask * (self.data > a_min)
+                if a_max is not None:
+                    mask = mask * (self.data < a_max)
+                self.grad += _sum_to_shape(out.grad * mask, self.data.shape)
+
+        out._backward = _backward
+        return out
+
+    # alias common name
+    def clamp(self, min=None, max=None):
+        return self.clip(min, max)
+
     def sum(self, axis=None, keepdims=False):
         out_data = self.data.sum(axis=axis, keepdims=keepdims)
         out = Tensor(out_data, requires_grad=self.requires_grad, name="sum")
@@ -253,6 +278,26 @@ class Tensor:
                     self.grad += np.broadcast_to(grad, self.data.shape)
                 else:
                     self.grad += np.ones_like(self.data) * out.grad
+
+        out._backward = _backward
+        return out
+
+    def __getitem__(self, idx):
+        """Basic indexing / slicing returning a new Tensor view (not a view in-place).
+
+        The returned tensor participates in autodiff; gradients are placed back
+        into the source tensor at the same indices during the backward pass.
+        """
+        out_data = self.data[idx]
+        out = self._create_child(out_data, "getitem", (self,), meta={"index": idx})
+
+        def _backward():
+            if self.requires_grad:
+                if out.grad is None:
+                    return
+                grad_buf = np.zeros_like(self.data)
+                grad_buf[idx] = out.grad
+                self.grad += _sum_to_shape(grad_buf, self.data.shape)
 
         out._backward = _backward
         return out

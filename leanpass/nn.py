@@ -38,6 +38,7 @@ class Linear(Module):
 
     def __call__(self, x: Tensor) -> Tensor:
         return self.forward(x)
+    
 
 
 class MLP(Module):
@@ -65,6 +66,31 @@ class MLP(Module):
         for layer in self.layers:
             params.extend(layer.parameters())
         return params
+
+
+class Dropout(Module):
+    """Simple dropout layer.
+
+    Usage: `Dropout(p=0.5)(x, training=True)` or call with `training=False` to
+    disable dropout at evaluation time.
+    """
+
+    def __init__(self, p: float = 0.5):
+        if not 0 <= p < 1:
+            raise ValueError("p must be in the interval [0, 1)")
+        self.p = float(p)
+
+    def forward(self, x: Tensor, training: bool = True) -> Tensor:
+        if not training or self.p == 0.0:
+            return x
+        # create a binary mask and scale to preserve expectation (inverted dropout)
+        mask = (np.random.rand(*x.data.shape) > self.p).astype(np.float64) / (1.0 - self.p)
+        return x * Tensor(mask)
+
+    def __call__(self, x: Tensor, training: bool = True) -> Tensor:
+        return self.forward(x, training=training)
+
+    
 
 
 def mse_loss(prediction: Tensor, target: Tensor) -> Tensor:
