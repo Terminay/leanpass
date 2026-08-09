@@ -30,6 +30,11 @@ LeanPass is a lightweight, transparent NumPy-based autodiff library for small ne
 - Linear layers and multilayer perceptrons
 - Loss utilities: `mse_loss`, `cross_entropy_loss`, and `binary_cross_entropy_loss`
 - SGD and Adam optimizers
+- SGD now supports momentum and L2 weight decay: `optim.SGD(params, lr=..., momentum=0.9, weight_decay=1e-4)`
+- Adam supports an optional L2 weight decay: `optim.Adam(params, lr=..., weight_decay=1e-4)`
+- Dropout layer: `nn.Dropout(p=0.5)` for inverted dropout during training
+- Tensor utilities: `Tensor.clip(a_min, a_max)` / `Tensor.clamp(min, max)` for value clamping
+- Basic indexing: `Tensor.__getitem__` supports slicing/indexing that participates in autodiff
 - A simple demo script that trains a toy model
 
 ## Installation

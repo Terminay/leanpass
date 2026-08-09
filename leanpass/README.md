@@ -37,6 +37,8 @@ Supported operations:
 - `Tensor.gelu()`
 - `Tensor.softmax()`
 - `Tensor.backward()`
+ - `Tensor.clip(a_min, a_max)` / `Tensor.clamp(min, max)`
+ - Basic indexing via `Tensor[...]` which participates in autodiff
 
 ### Neural network layers
 
@@ -51,6 +53,7 @@ Available components:
 
 - `nn.Linear(in_features, out_features)` creates a linear layer with weights and bias.
 - `nn.MLP(layer_sizes)` creates a multilayer perceptron with ReLU activations between layers.
+ - `nn.Dropout(p=0.5)` creates an inverted-dropout layer for training-time regularization.
 - `nn.mse_loss(predictions, targets)` computes mean squared error.
 - `nn.cross_entropy_loss(predictions, targets)` computes categorical cross-entropy for multi-class targets.
 - `nn.binary_cross_entropy_loss(predictions, targets)` computes binary cross-entropy for binary classification.
@@ -65,10 +68,10 @@ optimizer = optim.SGD(model.parameters(), lr=0.01)
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 ```
 
-Available optimizers:
+Available optimizers (options):
 
-- `optim.SGD(parameters, lr=...)` performs simple gradient descent.
-- `optim.Adam(parameters, lr=...)` performs Adam optimization with bias correction.
+- `optim.SGD(parameters, lr=..., momentum=0.0, weight_decay=0.0)` supports momentum and L2 weight decay.
+- `optim.Adam(parameters, lr=..., weight_decay=0.0)` supports an optional L2 weight decay term.
 
 ### Example
 
