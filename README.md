@@ -57,6 +57,13 @@ pip install leanpass
 
 Full documentation is available at [**leanpass.kilobyte136.workers.dev**](https://leanpass.kilobyte136.workers.dev/) and includes API reference, core concept explanations, and hands-on guides covering regression, classification, MNIST, gradient checking, and custom layers.
 
+### DeepWiki
+
+To delve more into the development of leanpass, you could check out the *devin indexed* deepwiki docs.
+The deepwiki docs update *1 day later* of every release or update made to leanpass, note that.
+
+[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/Terminay/leanpass)
+
 ## Quick start
 
 ```python
