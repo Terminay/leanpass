@@ -62,7 +62,7 @@ Full documentation is available at [**leanpass.kilobyte136.workers.dev**](https:
 To delve more into the development of leanpass, you could check out the *devin indexed* deepwiki docs.
 The deepwiki docs update *1 day later* of every release or update made to leanpass, note that.
 
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/Terminay/leanpass)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Terminay/leanpass)
 
 ## Quick start
 
