@@ -251,3 +251,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Terminay/leanpass&type=date&legend=top-left&sealed_token=fJJr1fCgBwIlSkOw9Bp_9bc9MkssvAAEXVRl4UOSqEW5yT80eFu6udpyDwky0B7yFSTDkhePBqlxOWrvImDSxj6GfEa1klFvjAIRvXc9KM3SGBoVv__Sbw" />
  </picture>
 </a>
+
+## RepoVibes
+
+![RepoVibes](https://repovibes.vercel.app/api/hexagon/Terminay/leanpass.svg)
