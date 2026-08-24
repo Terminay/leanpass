@@ -108,6 +108,8 @@ class Tensor:
 
     def __truediv__(self, other):
         other = other if isinstance(other, Tensor) else Tensor(other)
+        if np.any(other.data == 0):
+            raise ZeroDivisionError("Tensor division by zero")
         out = self._create_child(self.data / other.data, "/", (self, other))
 
         def _backward():
