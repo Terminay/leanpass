@@ -97,3 +97,11 @@ def test_tensor_gelu_backward():
     assert x.grad.shape == x.data.shape
     assert np.all(np.isfinite(x.grad))
     assert np.all(x.grad != 0)
+
+
+def test_truediv_raises_on_zero_divisor():
+    import pytest
+    x = Tensor([1.0, 2.0], requires_grad=True)
+    y = Tensor([1.0, 0.0], requires_grad=False)
+    with pytest.raises(ZeroDivisionError):
+        _ = x / y
