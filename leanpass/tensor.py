@@ -132,8 +132,10 @@ class Tensor:
         out._backward = _backward
         return out
 
-    def exp(self):
-        out = self._create_child(np.exp(self.data), "exp", {self})
+    def exp(self, a_max=700.0):
+        """Compute element-wise exponential with numerical stability guard against overflow."""
+        clipped = np.clip(self.data, None, a_max)
+        out = self._create_child(np.exp(clipped), "exp", (self,), meta={"a_max": a_max})
 
         def _backward():
             if self.requires_grad:
@@ -142,32 +144,44 @@ class Tensor:
         out._backward = _backward
         return out
 
-    def log(self):
-        out = self._create_child(np.log(self.data), "log", {self})
+    def log(self, eps=1e-15):
+        """Compute element-wise natural logarithm with numerical stability guard for non-positive inputs."""
+        clipped = np.clip(self.data, eps, None)
+        out = self._create_child(np.log(clipped), "log", (self,), meta={"eps": eps})
 
         def _backward():
             if self.requires_grad:
-                self.grad += _sum_to_shape(out.grad / self.data, self.data.shape)
+                self.grad += _sum_to_shape(out.grad / clipped, self.data.shape)
 
         out._backward = _backward
         return out
 
     def sigmoid(self):
-        out = self._create_child(1 / (1 + np.exp(-self.data)), "sigmoid", {self})
+        """Compute element-wise sigmoid with numerical stability avoiding overflow for negative inputs."""
+        pos_mask = self.data >= 0
+        neg_mask = ~pos_mask
+        out_data = np.empty_like(self.data, dtype=np.float64)
+        out_data[pos_mask] = 1.0 / (1.0 + np.exp(-self.data[pos_mask]))
+        exp_neg = np.exp(self.data[neg_mask])
+        out_data[neg_mask] = exp_neg / (1.0 + exp_neg)
+        out = self._create_child(out_data, "sigmoid", (self,))
 
         def _backward():
             if self.requires_grad:
-                sigmoid_grad = out.data * (1 - out.data)
+                sigmoid_grad = out.data * (1.0 - out.data)
                 self.grad += _sum_to_shape(out.grad * sigmoid_grad, self.data.shape)
 
         out._backward = _backward
         return out
 
     def softmax(self, axis=-1):
+        """Compute softmax with numerical stability via max-subtraction and exponent clipping."""
         shifted = self.data - self.data.max(axis=axis, keepdims=True)
+        shifted = np.clip(shifted, -700.0, 0.0)
         exp_values = np.exp(shifted)
-        probabilities = exp_values / exp_values.sum(axis=axis, keepdims=True)
-        out = self._create_child(probabilities, "softmax", {self})
+        sum_exp = exp_values.sum(axis=axis, keepdims=True)
+        probabilities = exp_values / np.maximum(sum_exp, 1e-15)
+        out = self._create_child(probabilities, "softmax", (self,), meta={"axis": axis})
 
         def _backward():
             if self.requires_grad:
@@ -481,17 +495,27 @@ class Tensor:
             elif node._op == "relu":
                 values[node] = np.maximum(0, values[node._prev[0]])
             elif node._op == "exp":
-                values[node] = np.exp(values[node._prev[0]])
+                a_max = node._meta.get("a_max", 700.0)
+                values[node] = np.exp(np.clip(values[node._prev[0]], None, a_max))
             elif node._op == "log":
-                values[node] = np.log(values[node._prev[0]])
+                eps = node._meta.get("eps", 1e-15)
+                values[node] = np.log(np.clip(values[node._prev[0]], eps, None))
             elif node._op == "sigmoid":
                 x = values[node._prev[0]]
-                values[node] = 1 / (1 + np.exp(-x))
+                pos = x >= 0
+                neg = ~pos
+                res = np.empty_like(x, dtype=np.float64)
+                res[pos] = 1.0 / (1.0 + np.exp(-x[pos]))
+                exp_neg = np.exp(x[neg])
+                res[neg] = exp_neg / (1.0 + exp_neg)
+                values[node] = res
             elif node._op == "softmax":
                 x = values[node._prev[0]]
-                shifted = x - x.max(axis=-1, keepdims=True)
+                axis = node._meta.get("axis", -1)
+                shifted = np.clip(x - x.max(axis=axis, keepdims=True), -700.0, 0.0)
                 exp_values = np.exp(shifted)
-                values[node] = exp_values / exp_values.sum(axis=-1, keepdims=True)
+                sum_exp = exp_values.sum(axis=axis, keepdims=True)
+                values[node] = exp_values / np.maximum(sum_exp, 1e-15)
             elif node._op == "sum":
                 values[node] = values[node._prev[0]].sum()
             elif node._op == "mean":
@@ -604,17 +628,27 @@ class Tensor:
             elif node._op == "relu":
                 node.data = np.maximum(0, list(node._prev)[0].data)
             elif node._op == "exp":
-                node.data = np.exp(list(node._prev)[0].data)
+                a_max = node._meta.get("a_max", 700.0)
+                node.data = np.exp(np.clip(list(node._prev)[0].data, None, a_max))
             elif node._op == "log":
-                node.data = np.log(list(node._prev)[0].data)
+                eps = node._meta.get("eps", 1e-15)
+                node.data = np.log(np.clip(list(node._prev)[0].data, eps, None))
             elif node._op == "sigmoid":
                 x = list(node._prev)[0].data
-                node.data = 1 / (1 + np.exp(-x))
+                pos = x >= 0
+                neg = ~pos
+                res = np.empty_like(x, dtype=np.float64)
+                res[pos] = 1.0 / (1.0 + np.exp(-x[pos]))
+                exp_neg = np.exp(x[neg])
+                res[neg] = exp_neg / (1.0 + exp_neg)
+                node.data = res
             elif node._op == "softmax":
                 x = list(node._prev)[0].data
-                shifted = x - x.max(axis=-1, keepdims=True)
+                axis = node._meta.get("axis", -1)
+                shifted = np.clip(x - x.max(axis=axis, keepdims=True), -700.0, 0.0)
                 exp_values = np.exp(shifted)
-                node.data = exp_values / exp_values.sum(axis=-1, keepdims=True)
+                sum_exp = exp_values.sum(axis=axis, keepdims=True)
+                node.data = exp_values / np.maximum(sum_exp, 1e-15)
             elif node._op == "sum":
                 node.data = list(node._prev)[0].data.sum()
             elif node._op == "mean":
