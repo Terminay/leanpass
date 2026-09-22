@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Fetch open issues
         id: fetch
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const perPage = 100;
@@ -45,7 +45,7 @@ jobs:
             const slim = issues.map(i => ({
               number: i.number,
               title: i.title,
-              body: (i.body || "").slice(0, 2000),
+              body: (i.body || "").slice(0, 500),
               comments: i.comments,
               reactions: i.reactions ? i.reactions.total_count : 0,
               created_at: i.created_at,
@@ -110,7 +110,8 @@ jobs:
                   { role: "user", content: issuesJson },
                 ],
                 temperature: 0,
-                max_tokens: 1000,
+                max_tokens: 8000,
+                response_format: { type: "json_object" },
               }),
             });
 
@@ -129,19 +130,38 @@ jobs:
           NODEEOF
 
       - name: Parse, pick the weaker duplicate, comment & close
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           AI_RESPONSE: ${{ steps.ai.outputs.response }}
           DRY_RUN: ${{ inputs.dry_run }}
         with:
           script: |
+            function tryRepairTruncatedJson(text) {
+              const lastCompleteGroup = text.lastIndexOf("},{");
+              const lastCloseBrace = text.lastIndexOf("}");
+              const cutoff = lastCloseBrace > lastCompleteGroup ? lastCloseBrace : lastCompleteGroup;
+              if (cutoff === -1) return null;
+              const repaired = text.slice(0, cutoff + 1) + "]}";
+              try {
+                return JSON.parse(repaired);
+              } catch {
+                return null;
+              }
+            }
+
             let parsed;
+            const cleaned = process.env.AI_RESPONSE.trim().replace(/^```json/, "").replace(/^```/, "").replace(/```$/, "");
             try {
-              const cleaned = process.env.AI_RESPONSE.trim().replace(/^```json/, "").replace(/^```/, "").replace(/```$/, "");
               parsed = JSON.parse(cleaned);
             } catch (e) {
-              core.setFailed(`Could not parse model response as JSON: ${e}\nRaw: ${process.env.AI_RESPONSE}`);
-              return;
+              const repaired = tryRepairTruncatedJson(cleaned);
+              if (repaired) {
+                core.warning("Model response looked truncated; recovered a partial result.");
+                parsed = repaired;
+              } else {
+                core.setFailed(`Could not parse model response as JSON: ${e}\nRaw: ${process.env.AI_RESPONSE}`);
+                return;
+              }
             }
 
             const groups = parsed.groups || [];
