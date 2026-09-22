@@ -22,6 +22,8 @@ I am incredibly grateful to the early contributors helping me shape this project
 Made with [contrib.rocks](https://contrib.rocks).
 
 *Want to help out?* I am actively looking for fresh eyes to test features, fix bugs, or improve docs. Check out the open [Issues](https://github.com/Terminay/leanpass) or just open a PR.
+> [!NOTE]
+> If your profile picture isn't showing up yet, Contrib.Rocks can take a few days to update due to high traffic.
 
 ![demo](leanpass.gif)
 
