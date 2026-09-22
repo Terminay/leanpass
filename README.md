@@ -240,19 +240,6 @@ LeanPass is actively maintained and used for educational purposes. The core API 
 - Bug reports and feature requests can be opened through the issue templates in [.github/ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE).
 - Pull requests should follow the template in [.github/PULL_REQUEST_TEMPLATE/pull_request_template.md](.github/PULL_REQUEST_TEMPLATE/pull_request_template.md).
 
-
-## Contributors
-
-<!-- CONTRIBUTORS-TABLE:START -->
-
-| Contributor | Follow | First PR |
-| ----------- | ------ | -------- |
-| [eeshsaxena](https://github.com/eeshsaxena) | [Follow](https://github.com/eeshsaxena) | [#18](https://github.com/Terminay/leanpass/pull/18) |
-| [VedantMadane](https://github.com/VedantMadane) | [Follow](https://github.com/VedantMadane) | [#40](https://github.com/Terminay/leanpass/pull/40) |
-| [Chirudeva-Reddy](https://github.com/Chirudeva-Reddy) | [Follow](https://github.com/Chirudeva-Reddy) | [#56](https://github.com/Terminay/leanpass/pull/56) |
-
-<!-- CONTRIBUTORS-TABLE:END -->
-
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
