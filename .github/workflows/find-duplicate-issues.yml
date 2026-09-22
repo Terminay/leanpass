@@ -1,0 +1,194 @@
+name: Find & Close Duplicate Issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue # to check for duplicates (blank = scan all open issues)"
+        required: false
+        type: string
+      dry_run:
+        description: "Dry run (comment nothing, just print what would happen)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  find-duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch open issues
+        id: fetch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const perPage = 100;
+            let issues = [];
+            let page = 1;
+            while (true) {
+              const { data } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "open",
+                per_page: perPage,
+                page,
+              });
+              issues.push(...data.filter(i => !i.pull_request));
+              if (data.length < perPage) break;
+              page++;
+            }
+
+            const slim = issues.map(i => ({
+              number: i.number,
+              title: i.title,
+              body: (i.body || "").slice(0, 2000),
+              comments: i.comments,
+              reactions: i.reactions ? i.reactions.total_count : 0,
+              created_at: i.created_at,
+              url: i.html_url,
+            }));
+
+            core.setOutput("issues_json", JSON.stringify(slim));
+
+      - name: Ask Groq for duplicate groups
+        id: ai
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ISSUES_JSON: ${{ steps.fetch.outputs.issues_json }}
+          TARGET_ISSUE: ${{ inputs.issue_number }}
+        run: |
+          node <<'NODEEOF'
+          const fs = require("fs");
+
+          async function main() {
+            const issuesJson = process.env.ISSUES_JSON;
+            const targetIssue = process.env.TARGET_ISSUE || "";
+
+            let systemPrompt = "You detect duplicate GitHub issues for a small Python library called LeanPass (a lightweight NumPy autodiff library). You will be given a JSON array of open issues (number, title, body, comments, reactions, created_at, url). Group issues that describe the SAME underlying bug, request, or question, not just a similar topic. Two issues are duplicates only if resolving one would also resolve or answer the other. Be conservative: when in doubt, do NOT group them. Respond with ONLY minified JSON, no prose, no markdown fences, matching this shape: {\"groups\":[{\"issue_numbers\":[12,15],\"reason\":\"short reason these are duplicates\"}]}. If there are no duplicates, respond with {\"groups\":[]}.";
+
+            if (targetIssue) {
+              systemPrompt += ` Only consider groups that include issue #${targetIssue}. Ignore all other potential duplicate pairs that do not involve it.`;
+            }
+
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+              },
+              body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [
+                  { role: "system", content: systemPrompt },
+                  { role: "user", content: issuesJson },
+                ],
+                temperature: 0,
+                max_tokens: 1000,
+              }),
+            });
+
+            if (!response.ok) {
+              const text = await response.text();
+              console.error(text);
+              process.exit(1);
+            }
+
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `response<<EOF\n${content}\nEOF\n`);
+          }
+
+          main();
+          NODEEOF
+
+      - name: Parse, pick the weaker duplicate, comment & close
+        uses: actions/github-script@v7
+        env:
+          AI_RESPONSE: ${{ steps.ai.outputs.response }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        with:
+          script: |
+            let parsed;
+            try {
+              const cleaned = process.env.AI_RESPONSE.trim().replace(/^```json/, "").replace(/^```/, "").replace(/```$/, "");
+              parsed = JSON.parse(cleaned);
+            } catch (e) {
+              core.setFailed(`Could not parse model response as JSON: ${e}\nRaw: ${process.env.AI_RESPONSE}`);
+              return;
+            }
+
+            const groups = parsed.groups || [];
+            if (groups.length === 0) {
+              core.info("No duplicate groups found.");
+              return;
+            }
+
+            const dryRun = process.env.DRY_RUN === "true";
+
+            for (const group of groups) {
+              const numbers = group.issue_numbers;
+              if (!numbers || numbers.length < 2) continue;
+
+              const details = [];
+              for (const num of numbers) {
+                const { data } = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: num,
+                });
+                details.push(data);
+              }
+
+              details.sort((a, b) => {
+                const scoreA = (a.reactions?.total_count || 0) + a.comments;
+                const scoreB = (b.reactions?.total_count || 0) + b.comments;
+                if (scoreB !== scoreA) return scoreB - scoreA;
+                return new Date(a.created_at) - new Date(b.created_at);
+              });
+
+              const keeper = details[0];
+              const duplicates = details.slice(1);
+
+              for (const dup of duplicates) {
+                const message = [
+                  `Thanks for filing this! This looks like a duplicate of #${keeper.number} (${keeper.title}).`,
+                  "",
+                  `Reason: ${group.reason || "same underlying issue"}`,
+                  "",
+                  `Closing this one in favor of #${keeper.number} — please follow/comment there. If you think this was closed in error, feel free to reopen with more detail on how it differs.`,
+                ].join("\n");
+
+                core.info(`${dryRun ? "[dry-run] " : ""}Duplicate: #${dup.number} -> keeping #${keeper.number}`);
+                core.info(message);
+
+                if (!dryRun) {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: dup.number,
+                    body: message,
+                  });
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: dup.number,
+                    state: "closed",
+                    state_reason: "not_planned",
+                  });
+                  try {
+                    await github.rest.issues.addLabels({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: dup.number,
+                      labels: ["duplicate"],
+                    });
+                  } catch (e) {
+                    core.info(`Skipping label (may not exist): ${e.message}`);
+                  }
+                }
+              }
+            }
