@@ -1,0 +1,150 @@
+name: Update Contributors Table
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: update-contributors-table
+  cancel-in-progress: true
+
+jobs:
+  update-table:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build contributors table
+        id: build
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+
+            const perPage = 100;
+            let page = 1;
+            let allPRs = [];
+            while (true) {
+              const { data } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "closed",
+                base: "main",
+                sort: "created",
+                direction: "asc",
+                per_page: perPage,
+                page,
+              });
+              allPRs.push(...data);
+              if (data.length < perPage) break;
+              page++;
+            }
+
+            const mergedPRs = allPRs
+              .filter(pr => pr.merged_at)
+              .sort((a, b) => new Date(a.merged_at) - new Date(b.merged_at));
+
+            const firstPRByAuthor = new Map();
+            for (const pr of mergedPRs) {
+              const login = pr.user?.login;
+              if (!login) continue;
+              if (pr.user.type === "Bot") continue;
+              if (!firstPRByAuthor.has(login)) {
+                firstPRByAuthor.set(login, pr);
+              }
+            }
+
+            firstPRByAuthor.delete(context.repo.owner);
+
+            const rows = [...firstPRByAuthor.entries()].map(([login, pr]) => {
+              const name = pr.user.login;
+              const followUrl = `https://github.com/${login}`;
+              const prUrl = pr.html_url;
+              return `| [${name}](${followUrl}) | [Follow](${followUrl}) | [#${pr.number}](${prUrl}) |`;
+            });
+
+            const tableHeader = [
+              "| Contributor | Follow | First PR |",
+              "| ----------- | ------ | -------- |",
+            ];
+
+            const table = rows.length > 0
+              ? [...tableHeader, ...rows].join("\n")
+              : "_No external contributors yet — open a PR to be the first!_";
+
+            fs.writeFileSync("/tmp/contributors_table.md", table);
+            core.setOutput("count", rows.length);
+
+      - name: Insert table into README
+        run: |
+          set -e
+          README="README.md"
+          TABLE_FILE="/tmp/contributors_table.md"
+          START_MARK="<!-- CONTRIBUTORS-TABLE:START -->"
+          END_MARK="<!-- CONTRIBUTORS-TABLE:END -->"
+
+          if grep -qF "$START_MARK" "$README"; then
+            python3 - "$README" "$START_MARK" "$END_MARK" "$TABLE_FILE" <<'PYEOF'
+          import sys
+          readme_path, start_mark, end_mark, table_path = sys.argv[1:5]
+          with open(readme_path, "r", encoding="utf-8") as f:
+              content = f.read()
+          with open(table_path, "r", encoding="utf-8") as f:
+              table = f.read()
+          start_idx = content.index(start_mark) + len(start_mark)
+          end_idx = content.index(end_mark)
+          new_content = content[:start_idx] + "\n\n" + table + "\n\n" + content[end_idx:]
+          with open(readme_path, "w", encoding="utf-8") as f:
+              f.write(new_content)
+          PYEOF
+          else
+            python3 - "$README" "$START_MARK" "$END_MARK" "$TABLE_FILE" <<'PYEOF'
+          import re, sys
+          readme_path, start_mark, end_mark, table_path = sys.argv[1:5]
+          with open(readme_path, "r", encoding="utf-8") as f:
+              content = f.read()
+          with open(table_path, "r", encoding="utf-8") as f:
+              table = f.read()
+
+          block = (
+              "\n## Contributors\n\n"
+              f"{start_mark}\n\n{table}\n\n{end_mark}\n"
+          )
+
+          anchor = "## Community and contribution"
+          idx = content.find(anchor)
+          if idx == -1:
+              new_content = content.rstrip() + "\n" + block
+          else:
+              search_from = idx + len(anchor)
+              next_heading = re.search(r"\n## ", content[search_from:])
+              if next_heading:
+                  insert_at = search_from + next_heading.start() + 1
+                  new_content = content[:insert_at] + block + "\n" + content[insert_at:]
+              else:
+                  new_content = content.rstrip() + "\n" + block
+
+          with open(readme_path, "w", encoding="utf-8") as f:
+              f.write(new_content)
+          PYEOF
+          fi
+
+      - name: Commit changes if any
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- README.md; then
+            echo "No changes to README.md"
+          else
+            git add README.md
+            git commit -m "chore: update contributors table [skip ci]"
+            git push
+          fi
