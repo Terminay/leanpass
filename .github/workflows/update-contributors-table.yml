@@ -24,7 +24,7 @@ jobs:
 
       - name: Build contributors table
         id: build
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require("fs");
@@ -107,30 +107,28 @@ jobs:
           PYEOF
           else
             python3 - "$README" "$START_MARK" "$END_MARK" "$TABLE_FILE" <<'PYEOF'
-          import re, sys
+          import sys
           readme_path, start_mark, end_mark, table_path = sys.argv[1:5]
           with open(readme_path, "r", encoding="utf-8") as f:
               content = f.read()
           with open(table_path, "r", encoding="utf-8") as f:
               table = f.read()
 
-          block = (
-              "\n## Contributors\n\n"
-              f"{start_mark}\n\n{table}\n\n{end_mark}\n"
-          )
+          block = f"\n{start_mark}\n\n{table}\n\n{end_mark}\n"
 
-          anchor = "## Community and contribution"
-          idx = content.find(anchor)
-          if idx == -1:
+          anchor = "contrib.rocks/image?repo="
+          anchor_idx = content.find(anchor)
+          if anchor_idx == -1:
               new_content = content.rstrip() + "\n" + block
           else:
-              search_from = idx + len(anchor)
-              next_heading = re.search(r"\n## ", content[search_from:])
-              if next_heading:
-                  insert_at = search_from + next_heading.start() + 1
-                  new_content = content[:insert_at] + block + "\n" + content[insert_at:]
-              else:
+              close_tag_idx = content.find("</a>", anchor_idx)
+              if close_tag_idx == -1:
                   new_content = content.rstrip() + "\n" + block
+              else:
+                  insert_at = close_tag_idx + len("</a>")
+                  newline_after = content.find("\n", insert_at)
+                  insert_at = newline_after + 1 if newline_after != -1 else insert_at
+                  new_content = content[:insert_at] + block + content[insert_at:]
 
           with open(readme_path, "w", encoding="utf-8") as f:
               f.write(new_content)
