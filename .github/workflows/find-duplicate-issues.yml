@@ -74,14 +74,37 @@ jobs:
               systemPrompt += ` Only consider groups that include issue #${targetIssue}. Ignore all other potential duplicate pairs that do not involve it.`;
             }
 
-            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            const candidateModels = [
+              "llama-3.3-70b-versatile",
+              "llama-3.1-8b-instant",
+              "openai/gpt-oss-120b",
+              "openai/gpt-oss-20b",
+            ];
+
+            const modelsResp = await fetch("https://api.groq.com/openai/v1/models", {
+              headers: { "Authorization": `Bearer ${process.env.GROQ_API_KEY}` },
+            });
+
+            let modelToUse = candidateModels[0];
+            if (modelsResp.ok) {
+              const modelsData = await modelsResp.json();
+              const availableIds = (modelsData.data || []).map(m => m.id);
+              const match = candidateModels.find(m => availableIds.includes(m));
+              if (match) {
+                modelToUse = match;
+              } else if (availableIds.length > 0) {
+                modelToUse = availableIds[0];
+              }
+            }
+
+            let response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
               },
               body: JSON.stringify({
-                model: "llama-3.3-70b-versatile",
+                model: modelToUse,
                 messages: [
                   { role: "system", content: systemPrompt },
                   { role: "user", content: issuesJson },
@@ -93,7 +116,7 @@ jobs:
 
             if (!response.ok) {
               const text = await response.text();
-              console.error(text);
+              console.error(`Request with model ${modelToUse} failed: ${text}`);
               process.exit(1);
             }
 
