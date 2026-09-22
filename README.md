@@ -19,6 +19,16 @@ I am incredibly grateful to the early contributors helping me shape this project
   <img src="https://contrib.rocks/image?repo=Terminay/leanpass" />
 </a>
 
+<!-- CONTRIBUTORS-TABLE:START -->
+
+| Contributor | Follow | First PR |
+| ----------- | ------ | -------- |
+| [eeshsaxena](https://github.com/eeshsaxena) | [Follow](https://github.com/eeshsaxena) | [#18](https://github.com/Terminay/leanpass/pull/18) |
+| [VedantMadane](https://github.com/VedantMadane) | [Follow](https://github.com/VedantMadane) | [#40](https://github.com/Terminay/leanpass/pull/40) |
+| [Chirudeva-Reddy](https://github.com/Chirudeva-Reddy) | [Follow](https://github.com/Chirudeva-Reddy) | [#56](https://github.com/Terminay/leanpass/pull/56) |
+
+<!-- CONTRIBUTORS-TABLE:END -->
+
 Made with [contrib.rocks](https://contrib.rocks).
 
 *Want to help out?* I am actively looking for fresh eyes to test features, fix bugs, or improve docs. Check out the open [Issues](https://github.com/Terminay/leanpass) or just open a PR.
