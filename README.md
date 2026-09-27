@@ -13,6 +13,8 @@
 
 LeanPass is a lightweight, transparent NumPy-based autodiff library for small neural network experiments. It is designed to be easy to read, simple to inspect, and practical for learning how automatic differentiation works under the hood.
 
+_Leanpass is indexed in the [awesome-machine-learning](https://github.com/josephmisiti/awesome-machine-learning) repository, under the **python** section._
+
 I am incredibly grateful to the early contributors helping me shape this project! Click on their profiles below to **follow them** and check out their work:
 
 <a href="https://github.com/Terminay/leanpass/graphs/contributors">
