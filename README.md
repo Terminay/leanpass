@@ -11,9 +11,11 @@
 ![Real Downloads](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Terminay/LeanPass/main/badge.json)
 [![Stars](https://img.shields.io/github/stars/Terminay/LeanPass?style=social)](https://github.com/Terminay/LeanPass/stargazers)
 
-LeanPass is a lightweight, transparent NumPy-based autodiff library for small neural network experiments. It is designed to be easy to read, simple to inspect, and practical for learning how automatic differentiation works under the hood.
+Leanpass is a lightweight, transparent NumPy-based autodiff library for small neural network experiments. It is designed to be easy to read, simple to inspect, and practical for learning how automatic differentiation works under the hood.
 
 _Leanpass is indexed in the [awesome-machine-learning](https://github.com/josephmisiti/awesome-machine-learning) repository, under the **python** section._
+
+![demo](leanpass.gif)
 
 I am incredibly grateful to the early contributors helping me shape this project! Click on their profiles below to **follow them** and check out their work:
 
@@ -36,8 +38,6 @@ Made with [contrib.rocks](https://contrib.rocks).
 *Want to help out?* I am actively looking for fresh eyes to test features, fix bugs, or improve docs. Check out the open [Issues](https://github.com/Terminay/leanpass) or just open a PR.
 > [!NOTE]
 > If your profile picture isn't showing up yet, Contrib.Rocks can take a few days to update due to high traffic.
-
-![demo](leanpass.gif)
 
 ## Why LeanPass?
 
