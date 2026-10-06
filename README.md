@@ -69,7 +69,7 @@ pip install leanpass
 
 ## Documentation
 
-Full documentation is available at [**leanpass.kilobyte136.workers.dev**](https://leanpass.kilobyte136.workers.dev/) and includes API reference, core concept explanations, and hands-on guides covering regression, classification, MNIST, gradient checking, and custom layers.
+Full documentation is available at [**leanpass.kilobyte136.workers.dev**](https://leanpass.kilobyte136.workers.dev/) and includes API reference, core concept explanations, and hands-on guides covering regression, classification, MNIST, gradient checking, and custom layers. See the [changelog](docs/changelog.md) for the complete release history.
 
 ### DeepWiki
 
@@ -229,7 +229,7 @@ python -m examples.demo_regression
 - `static/` — images, icons, and other static assets
 - `.github/` — CI/CD workflows, issue templates, PR templates
 - `pyproject.toml` — package metadata and build configuration
-- `CHANGELOG.md` — release history
+- `docs/changelog.md` — release history
 - `CONTRIBUTING.md` — contribution guidelines
 - `SECURITY.md` — vulnerability disclosure process
 
