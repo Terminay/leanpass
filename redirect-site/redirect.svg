@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 320" fill="none">
+  <title>Animated route from the old docs address to the new one</title>
+  <defs>
+    <linearGradient id="route" x1="68" y1="231" x2="351" y2="87" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#CE4D2E"/>
+      <stop offset="1" stop-color="#18302B"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="420" height="320" filterUnits="userSpaceOnUse">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/>
+      <feOffset dy="12"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope=".12"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .traveler {
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .pulse {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: pulse 2.4s ease-out infinite;
+      }
+
+      @keyframes pulse {
+        0% { opacity: .55; transform: scale(.65); }
+        75%, 100% { opacity: 0; transform: scale(1.8); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .traveler,
+        .pulse {
+          display: none;
+        }
+      }
+    </style>
+  </defs>
+
+  <circle cx="210" cy="160" r="143" fill="#E4E6D9"/>
+  <circle cx="210" cy="160" r="123" stroke="#C7CABE" stroke-dasharray="2 7"/>
+
+  <g filter="url(#shadow)">
+    <path d="M82 222c45-85 76-113 128-102 41 9 65 39 112-22" stroke="#C7CABE" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 12"/>
+    <path d="M82 222c45-85 76-113 128-102 41 9 65 39 112-22" stroke="url(#route)" stroke-width="3" stroke-linecap="round"/>
+
+    <circle cx="82" cy="222" r="18" fill="#F1EEE4" stroke="#CE4D2E" stroke-width="3"/>
+    <circle cx="82" cy="222" r="6" fill="#CE4D2E"/>
+    <text x="58" y="263" fill="#5C7069" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">OLD ADDRESS</text>
+
+    <path d="M322 97c0-14 11-25 25-25s25 11 25 25c0 19-25 40-25 40s-25-21-25-40Z" fill="#18302B"/>
+    <circle cx="347" cy="97" r="8" fill="#F1EEE4"/>
+    <text x="291" y="165" fill="#18302B" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">NEW ADDRESS</text>
+
+    <circle class="pulse" cx="82" cy="222" r="12" fill="#CE4D2E"/>
+    <circle class="traveler" r="7" fill="#CE4D2E" stroke="#F1EEE4" stroke-width="3">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="M82 222c45-85 76-113 128-102 41 9 65 39 112-22"/>
+    </circle>
+  </g>
+</svg>

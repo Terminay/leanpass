@@ -1,12 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "leanpass",
+  "main": "cloudflare-worker.js",
   "compatibility_date": "2026-07-28",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "build"
+    "directory": "redirect-site",
+    "binding": "ASSETS",
+    "run_worker_first": true
   },
   "compatibility_flags": [
     "nodejs_compat"
