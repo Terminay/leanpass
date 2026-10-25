@@ -84,7 +84,7 @@ pip install leanpass
 
 ## Documentation
 
-Full documentation is available at [**leanpass.kilobyte136.workers.dev**](https://leanpass.kilobyte136.workers.dev/) and includes API reference, core concept explanations, and hands-on guides covering regression, classification, MNIST, gradient checking, and custom layers. See the [changelog](docs/changelog.md) for the complete release history.
+Full documentation is available at [**leanpass.vercel.app**](https://leanpass.vercel.app/) and includes API reference, core concept explanations, and hands-on guides covering regression, classification, MNIST, gradient checking, and custom layers. See the [changelog](docs/changelog.md) for the complete release history.
 
 ### DeepWiki
 
