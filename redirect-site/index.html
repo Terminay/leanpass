@@ -3,21 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f1eee4">
-    <meta name="description" content="The LeanPass documentation has moved. Find the guides and API reference at the new address.">
+    <meta name="theme-color" content="#f4f1e9">
+    <meta name="description" content="The LeanPass documentation has moved to leanpass.vercel.app.">
     <link rel="canonical" href="https://leanpass.vercel.app/">
     <link rel="icon" href="/redirect.svg" type="image/svg+xml">
     <title>LeanPass documentation has moved</title>
     <style>
       :root {
         color-scheme: light;
-        --paper: #f1eee4;
-        --ink: #18302b;
-        --muted: #5c7069;
-        --line: #c7cabe;
-        --accent: #ce4d2e;
-        --accent-dark: #a73920;
-        --surface: #e4e6d9;
+        font-family: Georgia, "Times New Roman", serif;
+        color: #252b25;
+        background: #f4f1e9;
       }
 
       * {
@@ -25,298 +21,82 @@
       }
 
       body {
+        display: grid;
         min-width: 320px;
         min-height: 100vh;
         margin: 0;
-        color: var(--ink);
-        background:
-          radial-gradient(ellipse at 78% 34%, rgb(221 224 209 / 58%), transparent 34rem),
-          var(--paper);
-        font-family: "Aptos", "Segoe UI", sans-serif;
-      }
-
-      .frame {
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-        padding: clamp(1.25rem, 4vw, 3.5rem);
-      }
-
-      .masthead,
-      .foot {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-      }
-
-      .wordmark {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.7rem;
-        letter-spacing: 0.11em;
-      }
-
-      .mark {
-        width: 1.7rem;
-        height: 1.7rem;
-      }
-
-      .masthead-note,
-      .foot {
-        color: var(--muted);
-      }
-
-      .content {
-        display: grid;
-        width: min(100%, 1120px);
-        flex: 1;
-        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.82fr);
-        align-items: center;
-        gap: clamp(2rem, 8vw, 8rem);
-        margin: 0 auto;
-        padding: 3rem 0;
-      }
-
-      .copy {
-        position: relative;
-        z-index: 1;
-        max-width: 610px;
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.65rem;
-        margin: 0 0 1.5rem;
-        color: var(--accent-dark);
-        font-size: 0.74rem;
-        font-weight: 800;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-      }
-
-      .eyebrow::before {
-        width: 2rem;
-        height: 2px;
-        background: var(--accent);
-        content: "";
-      }
-
-      h1 {
-        max-width: 10ch;
-        margin: 0;
-        font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-        font-size: clamp(3.7rem, 8.5vw, 7.8rem);
-        font-weight: 500;
-        letter-spacing: -0.075em;
-        line-height: 0.91;
-      }
-
-      h1 em {
-        color: var(--accent);
-        font-weight: 500;
-      }
-
-      .intro {
-        max-width: 38rem;
-        margin: 2rem 0 0;
-        color: var(--muted);
-        font-size: clamp(1rem, 1.6vw, 1.2rem);
-        line-height: 1.75;
-      }
-
-      .destination {
-        display: inline-block;
-        margin-top: 0.45rem;
-        color: var(--ink);
-        font-weight: 700;
-        text-decoration-color: var(--accent);
-        text-underline-offset: 0.2em;
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1rem 1.35rem;
-        margin-top: 2rem;
-      }
-
-      .button {
-        display: inline-flex;
-        min-height: 3.6rem;
-        align-items: center;
-        justify-content: center;
-        gap: 1.1rem;
-        padding: 0.9rem 1.2rem 0.9rem 1.4rem;
-        border: 1px solid var(--accent);
-        border-radius: 2px;
-        color: white;
-        background: var(--accent);
-        font-size: 0.92rem;
-        font-weight: 750;
-        text-decoration: none;
-        transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
-      }
-
-      .button:hover {
-        transform: translateY(-2px);
-        border-color: var(--accent-dark);
-        background: var(--accent-dark);
-      }
-
-      .button:focus-visible,
-      .destination:focus-visible {
-        outline: 3px solid var(--ink);
-        outline-offset: 4px;
-      }
-
-      .button svg {
-        width: 1.15rem;
-        height: 1.15rem;
-      }
-
-      .microcopy {
-        color: var(--muted);
-        font-size: 0.78rem;
-        line-height: 1.5;
-      }
-
-      .art {
-        position: relative;
-        display: grid;
-        min-height: 340px;
+        padding: 2rem;
         place-items: center;
       }
 
-      .art::before {
-        position: absolute;
-        width: min(100%, 420px);
-        aspect-ratio: 1;
-        border: 1px solid var(--line);
-        border-radius: 50%;
-        content: "";
+      main {
+        width: min(100%, 680px);
+        text-align: center;
       }
 
-      .art::after {
-        position: absolute;
-        width: min(76%, 320px);
-        aspect-ratio: 1;
-        border: 1px dashed var(--line);
-        border-radius: 50%;
-        content: "";
-        transform: rotate(-18deg);
-      }
-
-      .art img {
-        z-index: 1;
-        width: min(100%, 390px);
+      img {
+        display: block;
+        width: 180px;
         height: auto;
-        filter: drop-shadow(0 25px 30px rgb(24 48 43 / 10%));
+        margin: 0 auto 2.5rem;
       }
 
-      .foot {
-        border-top: 1px solid var(--line);
-        padding-top: 1rem;
+      h1 {
+        margin: 0;
+        font-size: clamp(3rem, 8vw, 5.5rem);
+        font-weight: 400;
+        letter-spacing: -0.055em;
+        line-height: 1.02;
       }
 
-      @media (max-width: 760px) {
-        .content {
-          grid-template-columns: 1fr;
-          gap: 1rem;
-          padding: 3.5rem 0;
-        }
-
-        .art {
-          min-height: 240px;
-          grid-row: 1;
-        }
-
-        .art::before {
-          width: min(75vw, 300px);
-        }
-
-        .art::after {
-          width: min(57vw, 230px);
-        }
-
-        .art img {
-          width: min(70vw, 285px);
-        }
+      p {
+        margin: 1.5rem 0 2rem;
+        font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+        line-height: 1.6;
       }
 
-      @media (max-width: 480px) {
-        .masthead-note {
-          max-width: 9rem;
-          text-align: right;
-        }
+      a {
+        display: inline-flex;
+        min-height: 3.5rem;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.8rem 1.25rem;
+        color: #fffdf7;
+        background: #252b25;
+        font-size: 1.05rem;
+        text-decoration: none;
+        transition: background-color 150ms ease;
+      }
 
-        .foot {
-          align-items: flex-start;
-          flex-direction: column;
-        }
+      a:hover {
+        background: #a13e27;
+      }
+
+      a:focus-visible {
+        outline: 3px solid #a13e27;
+        outline-offset: 4px;
       }
 
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
         *::after {
-          scroll-behavior: auto !important;
           animation-duration: 0.01ms !important;
           animation-iteration-count: 1 !important;
           transition-duration: 0.01ms !important;
-        }
-
-        .button:hover {
-          transform: none;
         }
       }
     </style>
   </head>
   <body>
-    <div class="frame">
-      <header class="masthead">
-        <a class="wordmark" href="https://github.com/Terminay/LeanPass" aria-label="LeanPass on GitHub">
-          <img class="mark" src="/redirect.svg" alt="">
-          <span>LeanPass</span>
-        </a>
-        <span class="masthead-note">Documentation · Address update</span>
-      </header>
-
-      <main class="content">
-        <section class="copy" aria-labelledby="page-title">
-          <p class="eyebrow">A new home for the docs</p>
-          <h1 id="page-title">The docs have <em>moved.</em></h1>
-          <p class="intro">
-            The LeanPass guides, concepts, and API reference now live at a new address.
-            You can continue right where you left off.
-            <a class="destination" href="https://leanpass.vercel.app/">leanpass.vercel.app</a>
-          </p>
-          <div class="actions">
-            <a class="button" href="https://leanpass.vercel.app/">
-              Visit the new docs
-              <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
-                <path d="M3.5 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </a>
-            <span class="microcopy">Old guide links forward to their new pages.</span>
-          </div>
-        </section>
-
-        <div class="art">
-          <img src="/redirect.svg" alt="" width="420" height="320">
-        </div>
-      </main>
-
-      <footer class="foot">
-        <span>LeanPass · NumPy autodiff for learning</span>
-        <span>Same docs, new coordinates.</span>
-      </footer>
-    </div>
+    <main>
+      <img src="/redirect.svg" alt="">
+      <h1>The documentation has moved.</h1>
+      <p>LeanPass documentation is now at leanpass.vercel.app.</p>
+      <a href="https://leanpass.vercel.app/">
+        Visit the new documentation
+        <span aria-hidden="true">→</span>
+      </a>
+    </main>
   </body>
 </html>
