@@ -58,6 +58,20 @@ Returns a new Tensor: `max(0, x)` element-wise. Gradient-aware.
 ### `sigmoid()`
 Returns a new Tensor: `1 / (1 + exp(-x))` element-wise. Gradient-aware.
 
+### `tanh()`
+Returns a new Tensor: hyperbolic tangent, `tanh(x)`, element-wise. Gradient-aware (the gradient is `1 - tanh(x)^2`).
+
+### `leaky_relu(negative_slope=0.01)`
+Returns a new Tensor: `x` where `x >= 0`, otherwise `negative_slope * x`, element-wise. Gradient-aware (the gradient is `1` where `x >= 0`, otherwise `negative_slope`).
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `negative_slope` | float | `0.01` | Multiplier applied to negative inputs |
+
+### `gelu()`
+Returns a new Tensor with GELU applied element-wise. Uses the tanh approximation, not the exact erf-based form:
+`0.5 * x * (1 + tanh(sqrt(2 / pi) * (x + 0.044715 * x^3)))`. Gradient-aware.
+
 ### `softmax(axis=-1)`
 Returns a new Tensor with softmax applied along the specified axis.
 Shifts inputs by max for numerical stability before computing exponentials.
@@ -82,6 +96,20 @@ Returns a new Tensor with the mean of all elements (full reduction, not per-axis
 ### `matmul(other)`
 Matrix multiplication equivalent to `self @ other`.
 Returns a new Tensor.
+
+### `visualize()`
+Returns a plain-text description of the computation graph ending at this tensor, as a `str`.
+There is one `Node <id>: <op> shape=<shape>` line per node (leaf tensors show `leaf`, and the tensor's `name` is appended in parentheses if set), followed by one `Edge <src> -> <dst>` line per connection. The ids are Python object ids, so they differ between runs.
+
+### `visualize_dot()`
+Returns the computation graph ending at this tensor as a Graphviz DOT string (`digraph computation_graph`, laid out left to right). Leaf tensors are drawn as ellipses and operations as boxes; a tensor's `name` is added to its label. The method only builds the string: it does not write a file or need Graphviz installed. Render it yourself, for example by saving it to `graph.dot` and running `dot -Tpng graph.dot -o graph.png`.
+
+```python
+a = Tensor([1.0, 2.0], requires_grad=True, name="a")
+out = (a * 2).relu()
+print(out.visualize())
+dot = out.visualize_dot()
+```
 
 ## Operators
 
