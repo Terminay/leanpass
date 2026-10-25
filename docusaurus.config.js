@@ -7,7 +7,7 @@ const config = {
   tagline: 'A lightweight, NumPy-only reverse-mode autodiff library for educational use.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://leanpass.kilobyte136.workers.dev',
+  url: 'https://leanpass.vercel.app',
   baseUrl: '/',
 
   organizationName: 'Terminay',
