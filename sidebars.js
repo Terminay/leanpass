@@ -53,6 +53,8 @@ const sidebars = {
         'guides/regression',
         'guides/mnist',
         'guides/gradient-checking',
+        'guides/gradient-inspection',
+        'guides/computation-graph-visualization',
         'guides/custom-layer',
       ],
     },

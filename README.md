@@ -39,6 +39,21 @@ Made with [contrib.rocks](https://contrib.rocks).
 > [!NOTE]
 > If your profile picture isn't showing up yet, Contrib.Rocks can take a few days to update due to high traffic.
 
+## Table of contents
+
+- [Why LeanPass?](#why-leanpass)
+- [Features](#features)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Quick start](#quick-start)
+- [Examples](#examples)
+- [Development](#development)
+- [Project status](#project-status)
+- [Community and contribution](#community-and-contribution)
+- [License](#license)
+- [Star History](#star-history)
+- [RepoVibes](#repovibes)
+
 ## Why LeanPass?
 
 - Minimal dependency footprint: only NumPy
@@ -80,6 +95,8 @@ The deepwiki docs update *1 day later* of every release or update made to leanpa
 
 ## Quick start
 
+When leanpass is installed, build a small neural network and run a forward pass:
+
 ```python
 from leanpass import Tensor, nn
 
@@ -89,119 +106,9 @@ logits = model(x)
 print(logits)
 ```
 
-## Training loop example
-
-A complete training loop with visible loss output:
-
-```python
-import numpy as np
-from leanpass import Tensor, nn, optim
-
-# Synthetic 3-class data
-np.random.seed(1)
-x_data = np.random.randn(150, 2)
-y_data = np.eye(3)[np.random.randint(0, 3, 150)]
-
-model = nn.MLP([2, 16, 3])
-optimizer = optim.Adam(model.parameters(), lr=0.01)
-
-for step in range(100):
-    x = Tensor(x_data, requires_grad=False)
-    y = Tensor(y_data, requires_grad=False)
-
-    logits = model(x)
-    loss = nn.cross_entropy_loss(logits, y)
-
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-
-    if step % 20 == 0:
-        print(f"Step {step:03d} — Loss: {loss.data:.6f}")
-
-# Expected output (approx):
-# Step 000 — Loss: 1.098612
-# Step 020 — Loss: 0.987654
-# Step 040 — Loss: 0.876543
-# Step 060 — Loss: 0.765432
-# Step 080 — Loss: 0.654321
-```
-
-## Gradient inspection
-
-After calling `backward()`, every parameter that requires gradients has its `.grad` populated. You can inspect them directly:
-
-```python
-from leanpass import Tensor, nn
-
-model = nn.MLP([2, 4, 1])
-x = Tensor([[1.0, 2.0]], requires_grad=False)
-y = Tensor([[1.0]], requires_grad=False)
-
-pred = model(x)
-loss = nn.mse_loss(pred, y)
-loss.backward()
-
-# Inspect gradients on the first layer
-for i, param in enumerate(model.parameters()):
-    print(f"Param {i}: shape={param.data.shape}, grad_mean={param.grad.mean():.6f}, grad_max={param.grad.max():.6f}")
-
-# Example output:
-# Param 0: shape=(2, 4), grad_mean=0.012345, grad_max=0.098765
-# Param 1: shape=(4,), grad_mean=0.001234, grad_max=0.009876
-# Param 2: shape=(4, 1), grad_mean=0.023456, grad_max=0.187654
-# Param 3: shape=(1,), grad_mean=0.000123, grad_max=0.000987
-```
-
-## Computation graph visualization
-
-LeanPass can export the computation graph to Graphviz DOT format for visualization:
-
-```python
-from leanpass import Tensor, nn
-
-x = Tensor([[1.0, 2.0]], requires_grad=False)
-model = nn.MLP([2, 4, 3])
-logits = model(x)
-target = Tensor([[0.0, 1.0, 0.0]], requires_grad=False)
-loss = nn.cross_entropy_loss(logits, target)
-
-# Print DOT source
-print(loss.visualize_dot())
-
-# Or save to file and render with Graphviz
-with open("graph.dot", "w") as f:
-    f.write(loss.visualize_dot())
-```
-
-Then render with:
-
-```bash
-pip install graphviz
-dot -Tpng graph.dot -o graph.png
-```
-
-The resulting graph shows the full computation chain from inputs through matrix multiplications, activations, and loss computation:
-
-![Computation graph](static/img/computation_graph.png)
-
-## Lightweight metrics
-
-LeanPass is designed to be minimal. Here is how it compares to other frameworks:
-
-| Library | Package Size | Lines of Code | Dependencies | Install Time |
-|---------|-------------|---------------|-------------|--------------|
-| **LeanPass** | **~8.5 KB** | **~730** | **1 (NumPy)** | **<1 second** |
-| Micrograd | ~15 KB | ~150 | 0 | ~1 second |
-| PyTorch | ~800+ MB | millions | many (CUDA, etc.) | ~minutes |
-| TensorFlow | ~1+ GB | millions | many (CUDA, etc.) | ~minutes |
-| JAX | ~200+ MB | millions | several | ~minutes |
-
-LeanPass is **~14,000x smaller** than PyTorch and **~40,000x smaller** than TensorFlow, while still providing the core autodiff, neural network layers, and optimizers needed for small-scale experiments and learning.
-
 ## Examples
 
-The repository includes several example scripts in the `examples/` directory:
+Explore runnable Python examples in [`examples/`](examples/):
 
 | Example | File | Description |
 |---------|------|-------------|
@@ -213,29 +120,15 @@ The repository includes several example scripts in the `examples/` directory:
 Run any example with:
 
 ```bash
-python -m examples.demo
-python -m examples.demo_xor
-python -m examples.demo_mnist_lite
-python -m examples.demo_regression
+python -m examples.demo                 # 3-class classification
+python -m examples.demo_xor             # XOR classification
+python -m examples.demo_mnist_lite      # MNIST-lite
+python -m examples.demo_regression      # Regression
 ```
-
-## Repository layout
-
-- `leanpass/` — the package source code (tensor, nn, optim)
-- `examples/` — example scripts (classification, XOR, MNIST-lite, regression)
-- `tests/` — regression and gradient-check tests
-- `docs/` — Docusaurus documentation source files
-- `src/` — Docusaurus theme and page configuration
-- `static/` — images, icons, and other static assets
-- `.github/` — CI/CD workflows, issue templates, PR templates
-- `pyproject.toml` — package metadata and build configuration
-- `docs/changelog.md` — release history
-- `CONTRIBUTING.md` — contribution guidelines
-- `SECURITY.md` — vulnerability disclosure process
 
 ## Development
 
-To run the test suite:
+Run the test suite from the repository root:
 
 ```bash
 pytest
@@ -243,7 +136,7 @@ pytest
 
 ## Project status
 
-LeanPass is actively maintained and used for educational purposes. The core API is stable, and new features are added primarily for learning and teaching value. Bug fixes and documentation improvements are welcome.
+LeanPass is an actively maintained NumPy autodiff project for education and small-scale neural network experiments. The core API is stable; bug reports and documentation improvements are welcome.
 
 ## Community and contribution
 
