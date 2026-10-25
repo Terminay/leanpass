@@ -74,10 +74,24 @@ Returns a new Tensor: `ln(x)` element-wise (natural logarithm).
 Note: `log(0)` returns `-inf`, `log(negative)` returns `nan`.
 
 ### `sum(axis=None, keepdims=False)`
-Returns a new Tensor with the sum of all elements (full reduction, not per-axis).
+Returns a new Tensor with the sum of the elements, reduced over all elements or over the given axis.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `axis` | int, tuple of int, or None | `None` | Axis or axes to reduce. Negative axes are allowed. `None` reduces over all elements and returns a scalar (0-d) Tensor |
+| `keepdims` | bool | `False` | If `True`, the reduced axes are kept with size 1 so the result broadcasts against the input |
+
+For an input of shape `(2, 3)`: `.sum()` has shape `()`, `.sum(axis=0)` has shape `(3,)`, `.sum(axis=1, keepdims=True)` has shape `(2, 1)`.
 
 ### `mean(axis=None, keepdims=False)`
-Returns a new Tensor with the mean of all elements (full reduction, not per-axis).
+Returns a new Tensor with the mean of the elements, reduced over all elements or over the given axis.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `axis` | int, tuple of int, or None | `None` | Axis or axes to reduce. Negative axes are allowed. `None` reduces over all elements and returns a scalar (0-d) Tensor |
+| `keepdims` | bool | `False` | If `True`, the reduced axes are kept with size 1 so the result broadcasts against the input |
+
+For an input of shape `(2, 3)`: `.mean()` has shape `()`, `.mean(axis=0)` has shape `(3,)`, `.mean(axis=1, keepdims=True)` has shape `(2, 1)`.
 
 ### `matmul(other)`
 Matrix multiplication equivalent to `self @ other`.
