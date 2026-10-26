@@ -30,6 +30,7 @@ I am incredibly grateful to the early contributors helping me shape this project
 | [eeshsaxena](https://github.com/eeshsaxena) | [Follow](https://github.com/eeshsaxena) | [#18](https://github.com/Terminay/leanpass/pull/18) |
 | [VedantMadane](https://github.com/VedantMadane) | [Follow](https://github.com/VedantMadane) | [#40](https://github.com/Terminay/leanpass/pull/40) |
 | [Chirudeva-Reddy](https://github.com/Chirudeva-Reddy) | [Follow](https://github.com/Chirudeva-Reddy) | [#56](https://github.com/Terminay/leanpass/pull/56) |
+| [bh-official](https://github.com/bh-official) | [Follow](https://github.com/bh-official) | [#83](https://github.com/Terminay/leanpass/pull/83) |
 
 <!-- CONTRIBUTORS-TABLE:END -->
 
